@@ -86,7 +86,7 @@ fi
 # ====== Plugins ======
 
 # Set the directory where the plugins will be installed
-ZINIT_HOME="{XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 
 # Download Zinit, if not already present
 if [[ ! -d $ZINIT_HOME ]]; then
@@ -183,8 +183,6 @@ eval "$(zoxide init --cmd cd zsh)"
 export PATH=/usr/local/go/bin:$PATH
 # Binary
 export PATH=$HOME/.local/bin:$PATH
-# Yazi
-export PATH=$HOME/yazi/target/release:$PATH
 # Spicetify
 export PATH=$HOME/.spicetify:$PATH
 # Neovim

@@ -8,9 +8,17 @@ To make this work, you need to have the following installed:
 
 - [git](https://git-scm.com/downloads/linux)
 - [brew](https://brew.sh/)
-- [stow](https://www.gnu.org/software/stow/) / [Homebrew mirror](https://formulae.brew.sh/formula/stow)
+- [stow](https://www.gnu.org/software/stow/) ([Homebrew mirror](https://formulae.brew.sh/formula/stow))
 - [Oh My Zsh](https://ohmyz.sh/)
 - [RobotoMono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/RobotoMono.zip)
+
+And just run the following commands:
+
+```sh
+stow [folder]
+```
+
+Where `[folder]` is the name of the folder you want to install.
 
 ## Terminal
 
@@ -25,8 +33,8 @@ As you can see, I use `Kitty` as my terminal emulator. You can change this to yo
 
 ### Relevant Files
 
-- [`.zshrc`](./.zshrc)
-- [`.config/kitty/`](./.config/kitty/)
+- [`.zshrc`](./zsh/.zshrc)
+- [`.config/kitty/`](./kitty/.config/kitty/)
 
 ## Prompt Engine
 
@@ -36,7 +44,7 @@ I use `Oh My Posh` as my prompt engine. You can change this to your preferred pr
 
 ### Relevant Files
 
-- [`.config/ohmyposh/`](./.config/ohmyposh/)
+- [`.config/ohmyposh/`](./ohmyposh/.config/ohmyposh/)
 
 ### Window Switcher
 
@@ -53,7 +61,7 @@ Use <bd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>R</kbd> to toggle Rofi.
 
 ### Relevant Files
 
-- [`.config/rofi/`](./.config/rofi/)
+- [`.config/rofi/`](./rofi/.config/rofi/)
 
 ## Tmux
 
@@ -66,7 +74,7 @@ Use <bd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>R</kbd> to toggle Rofi.
 
 ### Relevant Files
 
-- [`.tmux.conf`](./.tmux.conf)
+- [`.tmux.conf`](./tmux/.tmux.conf)
 
 ## NeoVim
 
@@ -83,11 +91,11 @@ Debugger is mapped to <kbd>Leader</kbd><kbd>b</kbd><kbd>t</kbd> (to place a brea
 
 ### Relevant Files
 
-- [`.config/nvim/`](./.config/nvim/)
+- [`.config/nvim/`](./nvim/.config/nvim/)
 
 ## Acknowledgements
 
-My config files are based of oof the following works:
+My config files are based of off the following works:
 
 - [Dreams of Autonomy](https://www.youtube.com/@dreamsofautonomy)
   - [Zsh config](https://www.youtube.com/watch?v=ud7YxC33Z3w)
