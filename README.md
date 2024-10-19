@@ -30,9 +30,7 @@ Where `[folder]` is the name of the folder you want to install.
 
 ## Terminal
 
-As you can see, I use `Kitty` as my terminal emulator. You can change this to your preferred terminal emulator, as long as you use Z shell.
-
-[Kitty](https://sw.kovidgoyal.net/kitty/binary/)
+I use [Kitty](https://sw.kovidgoyal.net/kitty/binary/) as my terminal emulator. You can change this to your preferred terminal emulator, as long as you use Z shell.
 
 ### Setup requires
 
@@ -46,9 +44,7 @@ As you can see, I use `Kitty` as my terminal emulator. You can change this to yo
 
 ## Prompt Engine
 
-I use `Oh My Posh` as my prompt engine. You can change this to your preferred prompt engine.
-
-[Oh My Posh](https://ohmyposh.dev/docs/installation/linux)
+I use [Oh My Posh](https://ohmyposh.dev/docs/installation/linux) as my prompt engine. You can change this to your preferred prompt engine.
 
 ### Relevant Files
 
@@ -56,13 +52,9 @@ I use `Oh My Posh` as my prompt engine. You can change this to your preferred pr
 
 ## Window Switcher
 
-I use a gruvbox-themed `Rofi` to switch between windows and launch applications.
+I use a [gruvbox-themed](https://github.com/bardisty/gruvbox-rofi) [Rofi](https://github.com/davatorium/rofi) to switch between windows and launch applications.
 
-Use <bd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>R</kbd> to toggle Rofi.
-
-[Rofi](https://github.com/davatorium/rofi)
-
-[gruvbox-rofi](https://github.com/bardisty/gruvbox-rofi)
+Use <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>R</kbd> to toggle Rofi.
 
 ### Setup requires
 
