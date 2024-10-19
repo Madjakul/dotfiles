@@ -57,7 +57,7 @@ return {
                 "debugpy", -- python debugger
                 "isort", -- python formatter
                 "black", -- python formatter
-                "ruff", -- python linter
+                -- "ruff", -- python linter
                 "docformatter", -- python formatter
                 "clang-format", -- C/C++ formatter
                 "taplo", -- tom formatter

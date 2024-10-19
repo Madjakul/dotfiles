@@ -147,6 +147,9 @@ zstyle ":fzf-tab:__complete:__zoxide_z:*" fzf-preview "ls --color $realpath"
 
 # ====== Aliases ======
 
+# Private aliases
+. ~/.local/bin/private_aliases
+
 # Set personal aliases, overriding those provided by Oh My Zsh libs,
 # plugins, and themes. Aliases can be placed here, though Oh My Zsh
 # users are encouraged to define aliases within a top-level file in
@@ -158,9 +161,17 @@ zstyle ":fzf-tab:__complete:__zoxide_z:*" fzf-preview "ls --color $realpath"
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
 alias ls="ls --color=auto"
+alias ll="ls -alF --color=auto"
+alias la="ls -A --color=auto"
+alias l="ls -CF --color=auto"
+
 alias nvim="nvim"
+
 alias e="exit"
+alias c="clear"
+
 alias reload-zsh="source ~/.zshrc"
 alias edit-zsh="nvim ~/.zshrc"
 
@@ -179,6 +190,8 @@ eval "$(zoxide init --cmd cd zsh)"
 
 # ====== Path ======
 
+# Rust
+. "$HOME/.cargo/env"
 # Golang
 export PATH=/usr/local/go/bin:$PATH
 # Binary

@@ -2,7 +2,15 @@
 
 My development environment files. Gruvbox-themed, using `zsh` and `tmux`.
 
-## Requirements
+## Easy Installation
+
+```sh
+curl -fsSL https://github.com/Madjakul/dotfiles/main/install.ubuntu.sh
+```
+
+## Manual Installation
+
+### Requirements
 
 To make this work, you need to have the following installed:
 
@@ -24,7 +32,7 @@ Where `[folder]` is the name of the folder you want to install.
 
 As you can see, I use `Kitty` as my terminal emulator. You can change this to your preferred terminal emulator, as long as you use Z shell.
 
-- [Kitty](https://sw.kovidgoyal.net/kitty/binary/)
+[Kitty](https://sw.kovidgoyal.net/kitty/binary/)
 
 ### Setup requires
 
@@ -40,20 +48,21 @@ As you can see, I use `Kitty` as my terminal emulator. You can change this to yo
 
 I use `Oh My Posh` as my prompt engine. You can change this to your preferred prompt engine.
 
-- [Oh My Posh](https://ohmyposh.dev/docs/installation/linux)
+[Oh My Posh](https://ohmyposh.dev/docs/installation/linux)
 
 ### Relevant Files
 
 - [`.config/ohmyposh/`](./ohmyposh/.config/ohmyposh/)
 
-### Window Switcher
+## Window Switcher
 
 I use a gruvbox-themed `Rofi` to switch between windows and launch applications.
 
 Use <bd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>R</kbd> to toggle Rofi.
 
-- [Rofi](https://github.com/davatorium/rofi)
-- [gruvbox-rofi](https://github.com/bardisty/gruvbox-rofi)
+[Rofi](https://github.com/davatorium/rofi)
+
+[gruvbox-rofi](https://github.com/bardisty/gruvbox-rofi)
 
 ### Setup requires
 
@@ -65,7 +74,7 @@ Use <bd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>R</kbd> to toggle Rofi.
 
 ## Tmux
 
-- [Tmux](https://github.com/tmux/tmux)
+[Tmux](https://github.com/tmux/tmux)
 
 ### Setup requires
 
@@ -78,12 +87,7 @@ Use <bd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>R</kbd> to toggle Rofi.
 
 ## NeoVim
 
-- [NeoVim](https://neovim.io/)
-
-### Setup requires
-
-- [Lazyvim](http://www.lazyvim.org/)
-- [GitHub Copilot](https://github.com/features/copilot)
+[NeoVim](https://neovim.io/)
 
 GitHub Copilot's auto-complete is mapped to <kbd>Alt</kbd> + <kbd>Enter</kbd>, while any other auto-complete is mapped to <kbd>Tab</kbd>.
 
