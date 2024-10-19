@@ -5,7 +5,7 @@ My development environment files. Gruvbox-themed, using `zsh` and `tmux`.
 ## Easy Installation
 
 ```sh
-curl -fsSL https://github.com/Madjakul/dotfiles/main/install.ubuntu.sh
+curl -fsSL https://raw.githubusercontent.com/Madjakul/dotfiles/refs/heads/main/install.ubuntu.sh
 ```
 
 ## Manual Installation
