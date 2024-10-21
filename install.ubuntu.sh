@@ -116,7 +116,7 @@ if [[ $- == *i* ]]; then
 fi
 EOT
 
-stow zsh
+stow --adopt zsh
 
 
 # ====== Kitty Terminal ======
@@ -136,7 +136,7 @@ step_msg "Setting Kitty as default terminal"
 sudo update-alternatives --config x-terminal-emulator
 gsettings set org.gnome.desktop.default-applications.terminal exec "kitty"
 
-stow kitty
+stow --adopt kitty
 
 
 # ====== Oh My Posh ======
@@ -144,7 +144,7 @@ stow kitty
 step_msg "Installing Oh My Posh"
 brew install jandedobbeleer/oh-my-posh/oh-my-posh
 
-stow ohmyposh
+stow --adopt ohmyposh
 
 
 # ====== Neovim ======
@@ -161,7 +161,7 @@ if ! command -v nvim &> /dev/null; then
     brew install neovim
 fi
 
-stow nvim
+stow --adopt nvim
 
 
 # ====== TMux ======
@@ -171,7 +171,7 @@ if ! command -v tmux &> /dev/null; then
     brew install tmux
 fi
 
-stow tmux
+stow --adopt tmux
 
 # TMux Plugin Manager
 git clone https://github.com/tmux-plugins/tpm $HOME/.tmux/plugins/tpm
@@ -186,7 +186,7 @@ if ! command -v rofi &> /dev/null; then
     sudo apt install rofi
 fi
 
-stow rofi
+stow --adopt rofi
 
 
 # ====== ======
