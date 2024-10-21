@@ -6,6 +6,10 @@ keymap.set("i", "jk", "<ESC>", { desc = "Exit insert mode with jk" })
 
 keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
 
+-- Better scrolling
+keymap.set("n", "j", "jzz", { desc = "Move cursor down and center screen" })
+keymap.set("n", "k", "kzz", { desc = "Move cursor up and center screen" })
+
 -- Save current file
 keymap.set("n", "<C-s>", ":w<esc>", { desc = "Use Ctrl=s to save the current file" }) -- Use Ctrl+s to save the current file
 
@@ -25,4 +29,3 @@ keymap.set("n", "<leader>tx", "<cmd>tabclose<CR>", { desc = "Close current tab" 
 keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" }) --  go to next tab
 keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" }) --  go to previous tab
 keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer in new tab" }) --  move current buffer to new tab
-

@@ -42,9 +42,10 @@ sudo apt upgrade -y
 if ! command -v brew &> /dev/null; then
     step_msg "Installing Homebrew"
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    test -d ~/.linuxbrew && eval "$(~/.linuxbrew/bin/brew shellenv)"
+    test -d $HOME/.linuxbrew && eval "$($HOME/.linuxbrew/bin/brew shellenv)"
     test -d /home/linuxbrew/.linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-    echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.bashrc
+    echo "export PATH=$HOME/.local/bin:$PATH" >> $HOME/.bashrc
+    echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> $HOME/.bashrc
 else
     step_msg "Updating Homebrew"
     brew update --force --quiet
@@ -73,12 +74,16 @@ if ! command -v stow &> /dev/null; then
     brew install stow
 fi
 
+source $HOME/.bashrc
+
 
 # ====== Install Oh My Zsh ======
 # Oh My Zsh
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
     step_msg "Installing Oh My Zsh"
     sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+else
+    error_msg "Oh My Zsh already installed"
 fi
 
 
@@ -90,53 +95,48 @@ sudo apt install chrome-gnome-shell
 sudo apt install font-manager
 sudo apt install unzip
 
+
 # ====== Fonts ======
 FONT_DIR="$HOME/.fonts"
 DOWNLOAD_DIR=$(xdg-user-dir DOWNLOAD)
 
 mkdir $FONT_DIR || true
-wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/RobotoMono.zip -P $DOWNLOAD_DIR
-unzip $DOWNLOAD_DIR/RobotoMono.zip -d $FONT_DIR
-fc-cache -fv
-
-
-# ====== Clone Dotfiles ======
-step_msg "Cloning Dotfiles in $HOME/dotfiles"
-git clone https://github.com/Madjakul/dotfiles.git $HOME/dotfiles
-cd $HOME/dotfiles
-
-
-# ====== Zsh Configuration ======
-# Set Zsh as default shell
-# Script better suited for remote password managed systems
-cat <<EOT >> $HOME/.bashrc
-if [[ $- == *i* ]]; then
-    export SHELL=/usr/bin/zsh
-    exec /usr/bin/zsh -l
+if [ ! -f "$FONT_DIR/RobotoMono-Regular.ttf" ]; then
+    step_msg "Installing Roboto Mono Nerd Font"
+    wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/RobotoMono.zip -P $DOWNLOAD_DIR
+    unzip $DOWNLOAD_DIR/RobotoMono.zip -d $FONT_DIR
+    fc-cache -fv
+else
+    error_msg "Roboto Mono Nerd Font already installed"
 fi
-EOT
 
-stow --adopt zsh
+
 
 
 # ====== Kitty Terminal ======
-# Requirements
-# fzf
-brew install fzf
-# Zoxide
-curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
 
 # Install Kitty Terminal
 if ! command -v kitty &> /dev/null; then
     step_msg "Installing Kitty Terminal"
-    brew install kitty
+    curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
+    # Create symbolic links to add kitty and kitten to PATH (assuming $HOME/.local/bin is in
+    # your system-wide PATH)
+    ln -sf $HOME/.local/kitty.app/bin/kitty $HOME/.local/kitty.app/bin/kitten $HOME/.local/bin/
+    # Place the kitty.desktop file somewhere it can be found by the OS
+    cp $HOME/.local/kitty.app/share/applications/kitty.desktop $HOME/.local/share/applications/
+    # If you want to open text files and images in kitty via your file manager also add the kitty-open.desktop file
+    cp $HOME/.local/kitty.app/share/applications/kitty-open.desktop $HOME/.local/share/applications/
+    # Update the paths to the kitty and its icon in the kitty desktop file(s)
+    sed -i "s|Icon=kitty|Icon=$(readlink -f $HOME)/.local/kitty.app/share/icons/hicolor/256x256/apps/kitty.png|g" $HOME/.local/share/applications/kitty*.desktop
+    sed -i "s|Exec=kitty|Exec=$(readlink -f $HOME)/.local/kitty.app/bin/kitty|g" $HOME/.local/share/applications/kitty*.desktop
+    # Make xdg-terminal-exec (and hence desktop environments that support it use kitty)
+    echo 'kitty.desktop' > $HOME/.config/xdg-terminals.list
 fi
 
 step_msg "Setting Kitty as default terminal"
 sudo update-alternatives --config x-terminal-emulator
 gsettings set org.gnome.desktop.default-applications.terminal exec "kitty"
 
-stow --adopt kitty
 
 
 # ====== Oh My Posh ======
@@ -144,12 +144,10 @@ stow --adopt kitty
 step_msg "Installing Oh My Posh"
 brew install jandedobbeleer/oh-my-posh/oh-my-posh
 
-stow --adopt ohmyposh
-
 
 # ====== Neovim ======
 # Install Node and NPM
-brew install node@23
+brew install node
 
 # Install Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -161,7 +159,8 @@ if ! command -v nvim &> /dev/null; then
     brew install neovim
 fi
 
-stow --adopt nvim
+step_msg "Installing Lazy Git"
+brew install jesseduffield/lazygit/lazygit
 
 
 # ====== TMux ======
@@ -171,12 +170,21 @@ if ! command -v tmux &> /dev/null; then
     brew install tmux
 fi
 
-stow --adopt tmux
 
 # TMux Plugin Manager
-git clone https://github.com/tmux-plugins/tpm $HOME/.tmux/plugins/tpm
+if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+    step_msg "Installing TMux Plugin Manager"
+    git clone https://github.com/tmux-plugins/tpm $HOME/.tmux/plugins/tpm
+else
+    error_msg "TMux Plugin Manager already installed"
+fi
 # Tmuxifier
-git clone https://github.com/jimeh/tmuxifier.git ~/.tmuxifier
+if [ ! -d "$HOME/.tmuxifier" ]; then
+    step_msg "Installing Tmuxifier"
+    git clone https://github.com/jimeh/tmuxifier.git $HOME/.tmuxifier
+else
+    error_msg "Tmuxifier already installed"
+fi
 
 
 # ====== Rofi ======
@@ -186,8 +194,39 @@ if ! command -v rofi &> /dev/null; then
     sudo apt install rofi
 fi
 
-stow --adopt rofi
 
+# ====== Zsh Configuration ======
+# Requirements
+# fzf
+brew install fzf
+# Zoxide
+if ! command -v zoxide &> /dev/null; then
+    curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+fi
+# Set Zsh as default shell
+step_msg "Setting Zsh as default shell"
+command -v zsh | sudo tee -a /etc/shells
+sudo chsh -s $(which zsh) $USER
+touch $HOME/$USER/.local/private_aliases || true
+chmod u+x $HOME/$USER/.local/private_aliases
+
+
+# ====== Clone Dotfiles ======
+if [ ! -d "$HOME/dotfiles" ]; then
+    step_msg "Cloning Dotfiles in $HOME/dotfiles"
+    git clone https://github.com/Madjakul/dotfiles.git $HOME/dotfiles
+    cd $HOME/dotfiles
+else
+    error_msg "Dotfiles already exist in $HOME/dotfiles"
+    cd $HOME/dotfiles
+fi
+
+stow kitty
+stow ohmyposh
+stow nvim
+stow tmux
+stow rofi
+stow zsh
 
 # ====== ======
 success_msg "Everything is ready!"
