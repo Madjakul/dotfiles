@@ -79,9 +79,6 @@ fi
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
     step_msg "Installing Oh My Zsh"
     sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-else
-    step_msg "Updating Oh My Zsh"
-    upgrade_oh_my_zsh
 fi
 
 
