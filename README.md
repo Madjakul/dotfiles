@@ -42,7 +42,7 @@ I use Kitty as my terminal emulator. You can change this to your preferred termi
 
 ## [Oh My Posh](https://ohmyposh.dev/docs/installation/linux)
 
-I use as my prompt engine. You can change this to your preferred prompt engine.
+I use Oh My Posh as my prompt engine. You can change this to your preferred prompt engine.
 
 ### Relevant Files
 
@@ -50,7 +50,7 @@ I use as my prompt engine. You can change this to your preferred prompt engine.
 
 ## [Rofi](https://github.com/davatorium/rofi/blob/next/INSTALL.md)
 
-I use a [gruvbox-themed](https://github.com/bardisty/gruvbox-rofi) [Rofi](https://github.com/davatorium/rofi) to switch between windows and launch applications.
+I use a [gruvbox-themed](https://github.com/bardisty/gruvbox-rofi) Rofi to switch between windows and launch applications.
 
 Use <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>R</kbd> to toggle Rofi.
 
