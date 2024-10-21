@@ -175,18 +175,6 @@ alias c="clear"
 alias reload-zsh="source ~/.zshrc"
 alias edit-zsh="nvim ~/.zshrc"
 
-# ====== Environment Variables ======
-
-# Oh-my-posh prompt
-eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/custom_gruvbox.toml)"
-# Tmuxifier
-eval "$(tmuxifier init -)"
-# Brew
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-# Fzf
-eval "$(fzf --zsh)"
-# Zoxide
-eval "$(zoxide init --cmd cd zsh)"
 
 # ====== Path ======
 
@@ -202,3 +190,17 @@ export PATH=$HOME/.spicetify:$PATH
 export PATH=/opt/nvim-linux64/bin:$PATH
 # Tmuxifier
 export PATH=$HOME/.tmuxifier/bin:$PATH
+
+
+# ====== Environment Variables ======
+
+# Brew
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# Oh-my-posh prompt
+eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/custom_gruvbox.toml)"
+# Tmuxifier
+eval "$(tmuxifier init -)"
+# Fzf
+eval "$(fzf --zsh)"
+# Zoxide
+eval "$(zoxide init --cmd cd zsh)"
