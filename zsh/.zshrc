@@ -175,6 +175,8 @@ alias c="clear"
 alias reload-zsh="source ~/.zshrc"
 alias edit-zsh="nvim ~/.zshrc"
 
+alias htop="btop"
+
 
 # ====== Path ======
 

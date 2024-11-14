@@ -94,6 +94,7 @@ sudo apt install gnome-shell-extensions
 sudo apt install chrome-gnome-shell
 sudo apt install font-manager
 sudo apt install unzip
+sudo apt install btop
 
 
 # ====== Fonts ======
