@@ -177,6 +177,8 @@ alias edit-zsh="nvim ~/.zshrc"
 
 alias htop="btop"
 
+alias update-kitty="curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin"
+
 
 # ====== Path ======
 
