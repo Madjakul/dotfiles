@@ -43,3 +43,6 @@ opt.swapfile = false
 opt.linebreak = true
 
 opt.cursorline = true
+
+-- views can only be fully collapsed with the global statusline
+opt.laststatus = 3

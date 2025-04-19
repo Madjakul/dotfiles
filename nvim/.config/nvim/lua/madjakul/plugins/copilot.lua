@@ -1,4 +1,14 @@
 return {
-    "github/copilot.vim",
-    vim.api.nvim_set_keymap("i", "<M-CR>", 'copilot#Accept("<CR>")', { expr = true, noremap = true, silent = true }),
+    "zbirenbaum/copilot.lua",
+    cmd = "Copilot",
+    event = "InsertEnter",
+    config = function()
+        require("copilot").setup({
+            suggestion = { enabled = false },
+            panel = { enabled = false },
+            filetypes = {
+                ["."] = false, -- Disable for unknown filetypes
+            },
+        })
+    end,
 }
