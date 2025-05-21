@@ -1,9 +1,12 @@
 return {
-    "morhetz/gruvbox",
+    "gruvbox-community/gruvbox",
     -- load at startup so `colorscheme` actually runs
     lazy = false,
     priority = 1000,
     config = function()
+        vim.g.gruvbox_transparent_bg = 0
+        vim.g.gruvbox_improved_strings = 0
+        vim.g.gruvbox_improved_warnings = 1
         -- choose soft/hard contrast for the dark theme
         vim.g.gruvbox_contrast_dark = "soft"
         -- if you want the light variant, use:

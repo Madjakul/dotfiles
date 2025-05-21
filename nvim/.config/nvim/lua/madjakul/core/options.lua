@@ -5,6 +5,8 @@ local opt = vim.opt
 opt.relativenumber = true
 opt.number = true
 opt.colorcolumn = "89"
+vim.env.TERM = "kitty"
+opt.termguicolors = true
 
 -- tabs & indentation
 opt.tabstop = 4 -- 4 spaces for tabs
