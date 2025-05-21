@@ -6,10 +6,6 @@ keymap.set("i", "jk", "<ESC>", { desc = "Exit insert mode with jk" })
 
 keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
 
--- Better scrolling
-keymap.set("n", "j", "jzz", { desc = "Move cursor down and center screen" })
-keymap.set("n", "k", "kzz", { desc = "Move cursor up and center screen" })
-
 -- Save current file
 keymap.set("n", "<C-s>", ":w<esc>", { desc = "Use Ctrl=s to save the current file" }) -- Use Ctrl+s to save the current file
 
