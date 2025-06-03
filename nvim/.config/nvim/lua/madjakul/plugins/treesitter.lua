@@ -2,25 +2,18 @@ return {
     "nvim-treesitter/nvim-treesitter",
     event = { "BufReadPre", "BufNewFile" },
     build = ":TSUpdate",
-    dependencies = {
-        "windwp/nvim-ts-autotag",
-    },
+    dependencies = { "windwp/nvim-ts-autotag" },
     config = function()
-        -- import nvim-treesitter plugin
         local treesitter = require("nvim-treesitter.configs")
 
-        -- configure treesitter
-        treesitter.setup({ -- enable syntax highlighting
-            highlight = {
-                enable = true,
-            },
-            -- enable indentation
-            indent = { enable = true },
-            -- enable autotagging (w/ nvim-ts-autotag plugin)
-            autotag = {
-                enable = true,
-            },
-            -- ensure these language parsers are installed
+        treesitter.setup({
+            -- these four to satisfy the TSConfig signature:
+            modules = {}, -- for any extra modules you might load
+            sync_install = false, -- install parsers synchronously?
+            ignore_install = {}, -- list of parsers to NEVER install
+            auto_install = true, -- install missing parsers on-the-fly?
+
+            -- now all your old settings
             ensure_installed = {
                 "bash",
                 "bibtex",
@@ -53,6 +46,7 @@ return {
                 "regex",
                 "rst",
                 "rust",
+                "scheme",
                 "sparql",
                 "sql",
                 "ssh_config",
@@ -64,6 +58,19 @@ return {
                 "xml",
                 "yaml",
             },
+
+            highlight = {
+                enable = true,
+                additional_vim_regex_highlighting = false,
+                custom_captures = {
+                    ["type"] = "Type",
+                },
+            },
+
+            indent = { enable = true },
+
+            autotag = { enable = true },
+
             incremental_selection = {
                 enable = true,
                 keymaps = {

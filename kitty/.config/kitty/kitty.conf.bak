@@ -1,7 +1,12 @@
 # BEGIN_KITTY_THEME
-# Gruvbox Dark
+# Gruvbox Dark Soft
 include current-theme.conf
 # END_KITTY_THEME
+
+# Color settings.
+enable_true_color yes
+window_background_opacity 1.0
+colorspace sRGB
 
 # Font settings.
 font_family         RobotoMono Nerd Font Mono
