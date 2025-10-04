@@ -95,6 +95,10 @@ sudo apt install chrome-gnome-shell
 sudo apt install font-manager
 sudo apt install unzip
 sudo apt install btop
+sudo apt install build-essential
+sudo apt install gcc make
+sudo apt install libreadline-dev
+sudo apt install luarocks
 
 
 # ====== Fonts ======
