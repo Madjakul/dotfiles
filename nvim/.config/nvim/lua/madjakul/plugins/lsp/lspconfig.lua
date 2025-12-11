@@ -68,9 +68,37 @@ return {
                     [vim.diagnostic.severity.INFO] = " ",
                 },
             },
-            virtual_text = { spacing = 4, prefix = "■" },
-            float = { source = true },
+            virtual_text = {
+                spacing = 4,
+                prefix = "■",
+                -- Filter out Pyright private import warnings
+                format = function(diagnostic)
+                    if diagnostic.source == "Pyright" and diagnostic.code == "reportPrivateImportUsage" then
+                        return nil
+                    end
+                    return diagnostic.message
+                end,
+            },
+            float = {
+                source = true,
+                -- Also filter from floating windows
+                format = function(diagnostic)
+                    if diagnostic.source == "Pyright" and diagnostic.code == "reportPrivateImportUsage" then
+                        return nil
+                    end
+                    return string.format("%s: %s", diagnostic.source, diagnostic.message)
+                end,
+            },
         })
+
+        -- After vim.diagnostic.config()
+        local orig_handler = vim.lsp.handlers["textDocument/publishDiagnostics"]
+        vim.lsp.handlers["textDocument/publishDiagnostics"] = function(err, result, ctx, config)
+            result.diagnostics = vim.tbl_filter(function(d)
+                return not (d.source == "Pyright" and d.code == "reportPrivateImportUsage")
+            end, result.diagnostics)
+            orig_handler(err, result, ctx, config)
+        end
 
         -- At the end of config function in lspconfig.lua
         vim.g.lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()

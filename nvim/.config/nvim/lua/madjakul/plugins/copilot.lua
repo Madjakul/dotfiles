@@ -1,3 +1,4 @@
+-- copilot.lua
 return {
     "zbirenbaum/copilot.lua",
     cmd = "Copilot",

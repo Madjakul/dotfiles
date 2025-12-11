@@ -44,12 +44,13 @@ return {
 
             -- Optional: Custom handlers ONLY for servers needing overrides
             -- (for defaults, mason-lspconfig skips this and uses vim.lsp.enable)
+            -- Update the handlers section in mason.lua to this:
             handlers = {
                 -- lua_ls custom settings
                 function(server_name)
                     if server_name == "lua_ls" then
                         local capabilities = require("cmp_nvim_lsp").default_capabilities()
-                        vim.lsp.config(server_name, {
+                        require("lspconfig")[server_name].setup({
                             capabilities = capabilities,
                             settings = {
                                 Lua = {
@@ -62,12 +63,35 @@ return {
                         })
                     -- graphql custom filetypes
                     elseif server_name == "graphql" then
-                        vim.lsp.config(server_name, {
+                        require("lspconfig")[server_name].setup({
                             filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
                         })
-                    -- For all other servers: let mason-lspconfig use defaults via vim.lsp.enable
+                    -- Pyright custom settings
+                    -- elseif server_name == "pyright" then
+                    --     local capabilities = require("cmp_nvim_lsp").default_capabilities()
+                    --     require("lspconfig")[server_name].setup({
+                    --         capabilities = capabilities,
+                    --         settings = {
+                    --             python = {
+                    --                 analysis = {
+                    --                     -- This is the key setting for private imports
+                    --                     diagnosticSeverityOverrides = {
+                    --                         ["reportPrivateImportUsage"] = "none",
+                    --                     },
+                    --                     -- Keep other diagnostics enabled
+                    --                     typeCheckingMode = "basic",
+                    --                     autoSearchPaths = true,
+                    --                     useLibraryCodeForTypes = true,
+                    --                 },
+                    --             },
+                    --         },
+                    --     })
+                    -- For all other servers: use default setup with capabilities
                     else
-                        vim.lsp.enable(server_name)
+                        local capabilities = require("cmp_nvim_lsp").default_capabilities()
+                        require("lspconfig")[server_name].setup({
+                            capabilities = capabilities,
+                        })
                     end
                 end,
             },
