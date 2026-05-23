@@ -38,3 +38,14 @@ luac.out
 *.i*86
 *.x86_64
 *.hex
+
+# Neovim
+nvim/.config/nvim/lazy-lock.json
+
+# macOS
+.DS_Store
+
+# Editor
+*.swp
+*.swo
+*~

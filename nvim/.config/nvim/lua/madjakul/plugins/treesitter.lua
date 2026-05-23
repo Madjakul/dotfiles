@@ -1,85 +1,90 @@
+-- lua/madjakul/plugins/treesitter.lua
+-- nvim-treesitter 1.0 API: require("nvim-treesitter.configs") was REMOVED.
+-- Use require("nvim-treesitter").setup() instead.
+-- autotag is now a standalone plugin with its own setup.
+
 return {
-    "nvim-treesitter/nvim-treesitter",
-    event = { "BufReadPre", "BufNewFile" },
-    build = ":TSUpdate",
-    dependencies = { "windwp/nvim-ts-autotag" },
-    config = function()
-        local treesitter = require("nvim-treesitter.configs")
+	"nvim-treesitter/nvim-treesitter",
+	event = { "BufReadPre", "BufNewFile" },
+	build = ":TSUpdate",
+	dependencies = {
+		-- nvim-ts-autotag now requires its own setup call (not via treesitter)
+		{
+			"windwp/nvim-ts-autotag",
+			config = function()
+				require("nvim-ts-autotag").setup({
+					opts = {
+						enable_close = true,
+						enable_rename = true,
+						enable_close_on_slash = false,
+					},
+				})
+			end,
+		},
+	},
+	config = function()
+		-- NEW API: require("nvim-treesitter"), NOT the old "nvim-treesitter.configs"
+		require("nvim-treesitter").setup({
+			ensure_installed = {
+				-- Core languages
+				"python",
+				"lua",
+				"bash",
+				"c",
+				"cpp",
+				"cuda",
+				"rust",
 
-        treesitter.setup({
-            -- these four to satisfy the TSConfig signature:
-            modules = {}, -- for any extra modules you might load
-            sync_install = false, -- install parsers synchronously?
-            ignore_install = {}, -- list of parsers to NEVER install
-            auto_install = true, -- install missing parsers on-the-fly?
+				-- Config / data formats
+				"json",
+				"yaml",
+				"toml",
+				"ini",
+				"xml",
 
-            -- now all your old settings
-            ensure_installed = {
-                "bash",
-                "bibtex",
-                "c",
-                "cmake",
-                "comment",
-                "cpp",
-                "css",
-                "csv",
-                "cuda",
-                "dockerfile",
-                "git_config",
-                "git_rebase",
-                "gitattributes",
-                "gitcommit",
-                "gitignore",
-                "go",
-                "graphql",
-                "html",
-                "http",
-                "ini",
-                "java",
-                "javascript",
-                "json",
-                "lua",
-                "make",
-                "markdown",
-                "markdown_inline",
-                "python",
-                "regex",
-                "rst",
-                "rust",
-                "scheme",
-                "sparql",
-                "sql",
-                "ssh_config",
-                "tmux",
-                "toml",
-                "tsv",
-                "typescript",
-                "vim",
-                "xml",
-                "yaml",
-            },
+				-- Markup
+				"markdown",
+				"markdown_inline",
+				"bibtex",
+				"rst",
+				"latex",
 
-            highlight = {
-                enable = true,
-                additional_vim_regex_highlighting = false,
-                custom_captures = {
-                    ["type"] = "Type",
-                },
-            },
+				-- DevOps
+				"dockerfile",
+				"cmake",
+				"make",
+				"ssh_config",
 
-            indent = { enable = true },
+				-- Git
+				"git_config",
+				"git_rebase",
+				"gitattributes",
+				"gitcommit",
+				"gitignore",
 
-            autotag = { enable = true },
+				-- Editor / meta
+				"vim",
+				"vimdoc",
+				"tmux",
+				"regex",
+				"comment",
+			},
 
-            incremental_selection = {
-                enable = true,
-                keymaps = {
-                    init_selection = "<C-space>",
-                    node_incremental = "<C-space>",
-                    scope_incremental = false,
-                    node_decremental = "<bs>",
-                },
-            },
-        })
-    end,
+			auto_install = true,
+
+			highlight = {
+				enable = true,
+				-- Disable for large files (prevents freeze on accidental checkpoint opens)
+				disable = function(_, buf)
+					local max_filesize = 512 * 1024 -- 512 KB
+					local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
+					if ok and stats and stats.size > max_filesize then
+						return true
+					end
+				end,
+			},
+
+			indent = { enable = true },
+		})
+	end,
 }

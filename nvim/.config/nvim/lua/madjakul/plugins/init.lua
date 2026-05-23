@@ -1,4 +1,7 @@
+-- lua/madjakul/plugins/init.lua
+-- Shared dependencies loaded by other plugins
+
 return {
-    "nvim-lua/plenary.nvim",            -- lua functions that many plugins use
-    "christoomey/vim-tmux-navigator",   -- tmux & split window navigation
+    "nvim-lua/plenary.nvim",
+    "christoomey/vim-tmux-navigator",
 }

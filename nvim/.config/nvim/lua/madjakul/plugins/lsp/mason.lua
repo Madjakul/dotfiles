@@ -1,4 +1,7 @@
--- lua/madlakul/plugins/lsp/mason.lua
+-- lua/madjakul/plugins/lsp/mason.lua
+-- Trimmed to LSPs you actually use. Removed: gopls, graphql, cssls, html, sqlls.
+-- Tools: ruff replaces black + isort + docformatter (faster, Black-compatible).
+
 return {
     {
         "mason-org/mason.nvim",
@@ -19,83 +22,94 @@ return {
             "mason-org/mason.nvim",
             "neovim/nvim-lspconfig",
             "hrsh7th/cmp-nvim-lsp",
-            "folke/neodev.nvim",
+            "folke/lazydev.nvim",
         },
         event = { "BufReadPre", "BufNewFile" },
         opts = {
             ensure_installed = {
-                "bashls",
-                "clangd",
-                "cssls",
-                "dockerls",
-                "gopls",
-                "graphql",
-                "html",
-                "jsonls",
-                "lua_ls",
-                "pyright",
-                "rust_analyzer",
-                "sqlls",
-                "yamlls",
+                "bashls",           -- Bash
+                "clangd",           -- C/C++
+                "dockerls",         -- Dockerfiles
+                "jsonls",           -- JSON
+                "lua_ls",           -- Lua
+                "pyright",          -- Python (type checking)
+                "ruff",             -- Python (linting + formatting LSP)
+                "rust_analyzer",    -- Rust
+                "yamlls",           -- YAML
             },
             automatic_installation = true,
-            -- Let mason-lspconfig auto-enable all installed servers (uses vim.lsp.enable)
-            automatic_enable = true, -- default, but explicit for clarity
+            automatic_enable = true,
+        },
+        config = function(_, opts)
+            local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-            -- Optional: Custom handlers ONLY for servers needing overrides
-            -- (for defaults, mason-lspconfig skips this and uses vim.lsp.enable)
-            -- Update the handlers section in mason.lua to this:
-            handlers = {
-                -- lua_ls custom settings
-                function(server_name)
-                    if server_name == "lua_ls" then
-                        local capabilities = require("cmp_nvim_lsp").default_capabilities()
-                        require("lspconfig")[server_name].setup({
-                            capabilities = capabilities,
-                            settings = {
-                                Lua = {
-                                    diagnostics = { globals = { "vim" } },
-                                    completion = { callSnippet = "Replace" },
-                                    workspace = { checkThirdParty = false },
-                                    telemetry = { enable = false },
-                                },
+            -- Apply capabilities globally to all servers
+            vim.lsp.config("*", {
+                capabilities = capabilities,
+            })
+
+            -- Lua: recognize vim global
+            vim.lsp.config("lua_ls", {
+                settings = {
+                    Lua = {
+                        diagnostics = { globals = { "vim" } },
+                        completion = { callSnippet = "Replace" },
+                        workspace = { checkThirdParty = false },
+                        telemetry = { enable = false },
+                    },
+                },
+            })
+
+            -- Python: detect conda or virtualenv for Pyright
+            local function get_python_path()
+                if vim.env.CONDA_PREFIX then
+                    return vim.env.CONDA_PREFIX .. "/bin/python"
+                end
+                if vim.env.VIRTUAL_ENV then
+                    return vim.env.VIRTUAL_ENV .. "/bin/python"
+                end
+                return vim.fn.exepath("python3")
+            end
+
+            vim.lsp.config("pyright", {
+                settings = {
+                    python = {
+                        pythonPath = get_python_path(),
+                        analysis = {
+                            diagnosticSeverityOverrides = {
+                                ["reportPrivateImportUsage"] = "none",
                             },
-                        })
-                    -- graphql custom filetypes
-                    elseif server_name == "graphql" then
-                        require("lspconfig")[server_name].setup({
-                            filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
-                        })
-                    -- Pyright custom settings
-                    -- elseif server_name == "pyright" then
-                    --     local capabilities = require("cmp_nvim_lsp").default_capabilities()
-                    --     require("lspconfig")[server_name].setup({
-                    --         capabilities = capabilities,
-                    --         settings = {
-                    --             python = {
-                    --                 analysis = {
-                    --                     -- This is the key setting for private imports
-                    --                     diagnosticSeverityOverrides = {
-                    --                         ["reportPrivateImportUsage"] = "none",
-                    --                     },
-                    --                     -- Keep other diagnostics enabled
-                    --                     typeCheckingMode = "basic",
-                    --                     autoSearchPaths = true,
-                    --                     useLibraryCodeForTypes = true,
-                    --                 },
-                    --             },
-                    --         },
-                    --     })
-                    -- For all other servers: use default setup with capabilities
-                    else
-                        local capabilities = require("cmp_nvim_lsp").default_capabilities()
-                        require("lspconfig")[server_name].setup({
-                            capabilities = capabilities,
-                        })
+                            typeCheckingMode = "basic",
+                            autoSearchPaths = true,
+                            useLibraryCodeForTypes = true,
+                        },
+                    },
+                },
+            })
+
+            -- Ruff LSP: let it handle linting + import sorting,
+            -- but disable its hover in favor of Pyright's
+            vim.lsp.config("ruff", {
+                init_options = {
+                    settings = {
+                        lineLength = 89,
+                    },
+                },
+            })
+
+            -- Disable Ruff hover so Pyright's hover takes priority
+            vim.api.nvim_create_autocmd("LspAttach", {
+                group = vim.api.nvim_create_augroup("ruff_lsp_disable_hover", {}),
+                callback = function(args)
+                    local client = vim.lsp.get_client_by_id(args.data.client_id)
+                    if client and client.name == "ruff" then
+                        client.server_capabilities.hoverProvider = false
                     end
                 end,
-            },
-        },
+            })
+
+            require("mason-lspconfig").setup(opts)
+        end,
     },
 
     {
@@ -103,16 +117,22 @@ return {
         dependencies = "mason-org/mason.nvim",
         opts = {
             ensure_installed = {
-                "prettier",
-                "stylua",
-                "black",
-                "isort",
-                "shfmt",
-                "clang-format",
-                "eslint_d",
-                "debugpy",
-                "cmakelang",
-                "docformatter",
+                -- Formatters
+                "prettier",         -- JSON, YAML, Markdown
+                "stylua",           -- Lua
+                "shfmt",            -- Shell
+                "clang-format",     -- C/C++
+                "taplo",            -- TOML
+
+                -- Linters
+                "ruff",             -- Python lint + format (replaces black, isort, flake8)
+                "eslint_d",         -- JS/TS (kept for occasional web work)
+
+                -- Debuggers
+                "debugpy",          -- Python DAP
+
+                -- Build tools
+                "cmakelang",        -- CMake formatting
             },
         },
     },

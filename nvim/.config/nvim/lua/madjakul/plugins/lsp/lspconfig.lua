@@ -1,16 +1,26 @@
--- lua/madlakul/plugins/lsp/lspconfig.lua
+-- lua/madjakul/plugins/lsp/lspconfig.lua
+-- LSP keymaps (attached per-buffer) and diagnostic appearance.
+
 return {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
         "hrsh7th/cmp-nvim-lsp",
         { "antosha417/nvim-lsp-file-operations", config = true },
-        { "folke/neodev.nvim", opts = {} },
+        {
+            "folke/lazydev.nvim",
+            ft = "lua",
+            opts = {
+                library = {
+                    { path = "luvit-meta/library", words = { "vim%.uv" } },
+                },
+            },
+        },
+        { "Bilal2453/luvit-meta", lazy = true },
     },
     config = function()
         local keymap = vim.keymap
 
-        -- Global LSP keymaps on LspAttach
         vim.api.nvim_create_autocmd("LspAttach", {
             group = vim.api.nvim_create_augroup("UserLspConfig", {}),
             callback = function(ev)
@@ -51,56 +61,22 @@ return {
             end,
         })
 
-        -- Capabilities (shared by all servers)
-        local capabilities = require("cmp_nvim_lsp").default_capabilities()
-
-        -- Store them globally so mason-lspconfig handlers can access it
-        -- (already done inside the handler above, but keeping it here is fine too)
-        vim.g.lsp_capabilities = capabilities
-
-        -- Diagnostic appearance
         vim.diagnostic.config({
             signs = {
                 text = {
-                    [vim.diagnostic.severity.ERROR] = " ",
-                    [vim.diagnostic.severity.WARN] = " ",
-                    [vim.diagnostic.severity.HINT] = " ",
-                    [vim.diagnostic.severity.INFO] = " ",
+                    [vim.diagnostic.severity.ERROR] = " ",
+                    [vim.diagnostic.severity.WARN] = " ",
+                    [vim.diagnostic.severity.HINT] = " ",
+                    [vim.diagnostic.severity.INFO] = " ",
                 },
             },
             virtual_text = {
                 spacing = 4,
                 prefix = "■",
-                -- Filter out Pyright private import warnings
-                format = function(diagnostic)
-                    if diagnostic.source == "Pyright" and diagnostic.code == "reportPrivateImportUsage" then
-                        return nil
-                    end
-                    return diagnostic.message
-                end,
             },
             float = {
                 source = true,
-                -- Also filter from floating windows
-                format = function(diagnostic)
-                    if diagnostic.source == "Pyright" and diagnostic.code == "reportPrivateImportUsage" then
-                        return nil
-                    end
-                    return string.format("%s: %s", diagnostic.source, diagnostic.message)
-                end,
             },
         })
-
-        -- After vim.diagnostic.config()
-        local orig_handler = vim.lsp.handlers["textDocument/publishDiagnostics"]
-        vim.lsp.handlers["textDocument/publishDiagnostics"] = function(err, result, ctx, config)
-            result.diagnostics = vim.tbl_filter(function(d)
-                return not (d.source == "Pyright" and d.code == "reportPrivateImportUsage")
-            end, result.diagnostics)
-            orig_handler(err, result, ctx, config)
-        end
-
-        -- At the end of config function in lspconfig.lua
-        vim.g.lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
     end,
 }
