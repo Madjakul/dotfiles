@@ -2,141 +2,138 @@ console_title_template = '{{if .Root}}[root] {{end}}{{.Shell}} in <{{.Folder}}>'
 version = 3
 final_space = true
 
-# ====== Gruvbox Material Palette (pale/material foreground) ======
+# ====== Gruvbox Material Palette ======
 [palette]
-  bg = '#282828'
-  bg0_h = '#1D2021'
-  bg1 = '#32302f'
-  fg = '#d4be98'
-  fg1 = '#ddc7a1'
-  red = '#ea6962'
-  orange = '#e78a4e'
-  yellow = '#d8a657'
-  green = '#a9b665'
-  aqua = '#89b482'
-  blue = '#7daea3'
-  purple = '#d3869b'
-  gray = '#928374'
-  gray_dim = '#7c6f64'
+bg = '#282828'
+bg0_h = '#1D2021'
+bg1 = '#32302f'
+fg = '#d4be98'
+fg1 = '#ddc7a1'
+red = '#ea6962'
+orange = '#e78a4e'
+yellow = '#d8a657'
+green = '#a9b665'
+aqua = '#89b482'
+blue = '#7daea3'
+purple = '#d3869b'
+gray = '#928374'
 
 [secondary_prompt]
-  template = '❯❯ '
-  foreground = 'p:aqua'
-  background = 'transparent'
+template = "\u276f\u276f "
+foreground = 'p:aqua'
+background = 'transparent'
 
 [transient_prompt]
-  template = '❯ '
-  foreground = 'p:aqua'
-  background = 'transparent'
-  type = 'status'
-  style = 'plain'
-  foreground_templates = ['{{if gt .Code 0}}p:red{{end}}']
+template = "\u276f "
+foreground = 'p:aqua'
+background = 'transparent'
+type = 'status'
+style = 'plain'
+foreground_templates = ['{{if gt .Code 0}}p:red{{end}}']
 
 # ====== Main Prompt ======
 [[blocks]]
-  type = 'prompt'
-  alignment = 'left'
-  newline = true
+type = 'prompt'
+alignment = 'left'
+newline = true
 
-  # OS icon
-  [[blocks.segments]]
-    template = '{{ if .WSL }}WSL at{{ end }} {{.Icon}} '
-    foreground = 'p:fg'
-    background = 'p:bg'
-    type = 'os'
-    style = 'powerline'
+# OS icon
+[[blocks.segments]]
+template = "{{ if .WSL }}WSL at{{ end }} {{.Icon}} "
+foreground = 'p:fg'
+background = 'p:bg'
+type = 'os'
+style = 'powerline'
 
-  # Current path
-  [[blocks.segments]]
-    template = ' {{ .Path }} '
-    foreground = 'p:bg0_h'
-    background = 'p:blue'
-    type = 'path'
-    style = 'powerline'
-    [blocks.segments.properties]
-      style = 'full'
+# Current path
+[[blocks.segments]]
+template = " \uf07c {{ .Path }} "
+foreground = 'p:bg0_h'
+background = 'p:blue'
+type = 'path'
+style = 'powerline'
+[blocks.segments.properties]
+style = 'full'
 
-  # Git status
-  [[blocks.segments]]
-    template = ' {{ .HEAD }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Working.Changed }}  {{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }}  {{ end }}{{ if gt .StashCount 0 }}  {{ .StashCount }}{{ end }} '
-    foreground = 'p:bg0_h'
-    background = 'p:green'
-    type = 'git'
-    style = 'powerline'
-    background_templates = [
-      '{{ if or (.Working.Changed) (.Staging.Changed) }}p:yellow{{ end }}',
-      '{{ if and (gt .Ahead 0) (gt .Behind 0) }}p:orange{{ end }}',
-      '{{ if gt .Ahead 0 }}p:purple{{ end }}',
-      '{{ if gt .Behind 0 }}p:purple{{ end }}',
-    ]
-    [blocks.segments.properties]
-      branch_icon = ' '
-      branch_identical_icon = '●'
-      branch_max_length = 25.0
-      commit_icon = '@'
-      display_status_detail = false
-      fetch_stash_count = true
-      fetch_status = true
+# Git status
+[[blocks.segments]]
+template = " \ue0a0 {{ .HEAD }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Working.Changed }} \uf044 {{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }} \uf046 {{ end }}{{ if gt .StashCount 0 }} \uf01c {{ .StashCount }}{{ end }} "
+foreground = 'p:bg0_h'
+background = 'p:green'
+type = 'git'
+style = 'powerline'
+background_templates = [
+  '{{ if or (.Working.Changed) (.Staging.Changed) }}p:yellow{{ end }}',
+  '{{ if and (gt .Ahead 0) (gt .Behind 0) }}p:orange{{ end }}',
+  '{{ if gt .Ahead 0 }}p:purple{{ end }}',
+  '{{ if gt .Behind 0 }}p:purple{{ end }}',
+]
+[blocks.segments.properties]
+branch_icon = ''
+branch_identical_icon = "\u25cf"
+branch_max_length = 25.0
+commit_icon = '@'
+display_status_detail = false
+fetch_stash_count = true
+fetch_status = true
 
-  # Python + Conda environment
-  # Shows conda env name and Python version
-  [[blocks.segments]]
-    template = '  {{ if .Error }}{{ .Error }}{{ else }}{{ if .Venv }}({{ .Venv }}) {{ end }}{{ .Full }}{{ end }} '
-    foreground = 'p:bg0_h'
-    background = 'p:fg'
-    type = 'python'
-    style = 'powerline'
-    [blocks.segments.properties]
-      display_mode = 'context'
-      home_enabled = true
-      fetch_virtual_env = true
+# Python + Conda environment
+[[blocks.segments]]
+template = " \ue73c {{ if .Error }}{{ .Error }}{{ else }}{{ if .Venv }}({{ .Venv }}) {{ end }}{{ .Full }}{{ end }} "
+foreground = 'p:bg0_h'
+background = 'p:fg'
+type = 'python'
+style = 'powerline'
+[blocks.segments.properties]
+display_mode = 'context'
+home_enabled = true
+fetch_virtual_env = true
 
-  # Rust version (shown when in Rust projects)
-  [[blocks.segments]]
-    template = '  {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} '
-    foreground = 'p:bg0_h'
-    background = 'p:fg'
-    type = 'rust'
-    style = 'powerline'
-    [blocks.segments.properties]
-      display_mode = 'files'
-      fetch_version = true
+# Rust version
+[[blocks.segments]]
+template = " \ue7a8 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} "
+foreground = 'p:bg0_h'
+background = 'p:fg'
+type = 'rust'
+style = 'powerline'
+[blocks.segments.properties]
+display_mode = 'files'
+fetch_version = true
 
-  # Root indicator
-  [[blocks.segments]]
-    template = '  '
-    foreground = 'p:bg0_h'
-    background = 'p:fg'
-    type = 'root'
-    style = 'powerline'
+# Root indicator
+[[blocks.segments]]
+template = " \uf0e7 "
+foreground = 'p:bg0_h'
+background = 'p:fg'
+type = 'root'
+style = 'powerline'
 
 # ====== Right Prompt ======
 [[blocks]]
-  type = 'rprompt'
-  overflow = 'hidden'
+type = 'rprompt'
+overflow = 'hidden'
 
-  # Execution time (only for long commands >5s)
-  [[blocks.segments]]
-    template = '{{ .FormattedMs }}'
-    foreground = 'p:aqua'
-    background = 'transparent'
-    type = 'executiontime'
-    style = 'plain'
-    [blocks.segments.properties]
-      threshold = 5000
+[[blocks.segments]]
+template = '{{ .FormattedMs }}'
+foreground = 'p:aqua'
+background = 'transparent'
+type = 'executiontime'
+style = 'plain'
+[blocks.segments.properties]
+threshold = 5000
 
 # ====== Input Line ======
 [[blocks]]
-  type = 'prompt'
-  alignment = 'left'
-  newline = true
+type = 'prompt'
+alignment = 'left'
+newline = true
 
-  [[blocks.segments]]
-    template = '❯'
-    foreground = 'p:aqua'
-    background = 'transparent'
-    type = 'status'
-    style = 'plain'
-    foreground_templates = ['{{if gt .Code 0}}p:red{{end}}']
-    [blocks.segments.properties]
-      always_enabled = true
+[[blocks.segments]]
+template = "\u276f"
+foreground = 'p:aqua'
+background = 'transparent'
+type = 'status'
+style = 'plain'
+foreground_templates = ['{{if gt .Code 0}}p:red{{end}}']
+[blocks.segments.properties]
+always_enabled = true

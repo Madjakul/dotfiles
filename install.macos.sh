@@ -71,8 +71,20 @@ brew install \
     btop \
     sshfs \
     luarocks \
-    jesseduffield/lazygit/lazygit \
-    jandedobbeleer/oh-my-posh/oh-my-posh
+    jesseduffield/lazygit/lazygit
+
+# oh-my-posh via official install
+step_msg "Installing Oh My Posh"
+if ! command -v oh-my-posh &>/dev/null; then
+    brew install jandedobbeleer/oh-my-posh/oh-my-posh 2>/dev/null || \
+        curl -s https://ohmyposh.dev/install.sh | bash -s
+else
+    success_msg "Oh My Posh already installed"
+fi
+
+# tree-sitter CLI (required by nvim-treesitter to build parsers)
+step_msg "Installing tree-sitter CLI"
+npm install -g tree-sitter-cli
 
 # Kitty via brew cask on macOS (better integration than curl)
 step_msg "Installing Kitty"
@@ -98,10 +110,19 @@ if ! command -v conda &>/dev/null; then
     bash /tmp/miniconda.sh -b -p "$HOME/miniconda3"
     rm /tmp/miniconda.sh
     "$HOME/miniconda3/bin/conda" init zsh
-    "$HOME/miniconda3/bin/conda" config --set auto_activate_base false
+    "$HOME/miniconda3/bin/conda" config --set auto_activate_base true
     success_msg "Miniconda installed"
 else
     success_msg "Conda already installed"
+fi
+
+# Install gpustat in base env + set default packages for new envs
+step_msg "Configuring conda defaults"
+CONDA_BIN="${HOME}/miniconda3/bin/conda"
+if [[ -f "$CONDA_BIN" ]]; then
+    "$CONDA_BIN" run -n base pip install --quiet gpustat 2>/dev/null || true
+    "$CONDA_BIN" config --add create_default_packages gpustat 2>/dev/null || true
+    "$CONDA_BIN" config --add create_default_packages ipython 2>/dev/null || true
 fi
 
 
@@ -152,6 +173,10 @@ else
     success_msg "Tmuxifier already installed"
 fi
 
+# Auto-install tmux plugins
+step_msg "Installing tmux plugins via TPM"
+"$HOME/.tmux/plugins/tpm/bin/install_plugins" 2>/dev/null || warn_msg "TPM install failed (run Ctrl-a I in tmux later)"
+
 
 # ══════════════════════════════════════════════════════════════
 # ZSH CONFIGURATION
@@ -174,22 +199,36 @@ fi
 
 step_msg "Stowing dotfiles"
 cd "$HOME/dotfiles"
-# Note: rofi is Linux-only, skip on macOS
 for dir in kitty ohmyposh nvim tmux zsh; do
     if [[ -d "$dir" ]]; then
         stow --restow "$dir" 2>/dev/null || warn_msg "Could not stow $dir"
     fi
 done
 
+# Copy tmuxifier layouts
+step_msg "Installing tmuxifier layouts"
+mkdir -p "$HOME/.tmuxifier/layouts"
+cp -f "$HOME/dotfiles/tmuxifier-layouts/"*.sh "$HOME/.tmuxifier/layouts/" 2>/dev/null || true
+
+
+# ══════════════════════════════════════════════════════════════
+# NEOVIM: Headless first-run
+# ══════════════════════════════════════════════════════════════
+step_msg "Installing Neovim plugins (headless)"
+nvim --headless "+Lazy! sync" +qa 2>/dev/null || true
+
+step_msg "Installing treesitter parsers (headless)"
+nvim --headless \
+    "+TSInstall python lua bash c cpp cuda rust json yaml toml ini xml markdown markdown_inline bibtex rst latex dockerfile cmake make ssh_config git_config git_rebase gitattributes gitcommit gitignore vim vimdoc tmux comment" \
+    "+sleep 15" +qa 2>/dev/null || true
+
 
 # ══════════════════════════════════════════════════════════════
 # MACOS-SPECIFIC TWEAKS
 # ══════════════════════════════════════════════════════════════
 step_msg "Applying macOS tweaks"
-# Faster key repeat (for Neovim)
 defaults write NSGlobalDomain KeyRepeat -int 2
 defaults write NSGlobalDomain InitialKeyRepeat -int 15
-# Show hidden files in Finder
 defaults write com.apple.finder AppleShowAllFiles -bool true
 killall Finder 2>/dev/null || true
 
@@ -202,8 +241,7 @@ success_msg "Installation complete!"
 echo
 echo "Next steps:"
 echo "  1. Restart your terminal (or run: exec zsh)"
-echo "  2. Open Neovim — plugins and Mason tools auto-install"
-echo "  3. In tmux, press Ctrl-a then I to install tmux plugins"
-echo "  4. Set ANTHROPIC_API_KEY in ~/.local/bin/private_aliases"
-echo "  5. Run: bash ~/dotfiles/scripts/dry-run.sh to verify everything"
+echo "  2. Open Neovim to verify plugins loaded"
+echo "  3. Set ANTHROPIC_API_KEY in ~/.local/bin/private_aliases"
+echo "  4. Run: bash ~/dotfiles/scripts/dry-run.sh"
 echo

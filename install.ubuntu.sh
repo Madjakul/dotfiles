@@ -1,27 +1,14 @@
 #!/usr/bin/env bash
-# install.ubuntu.sh
-# Full workspace installation for Ubuntu 22.04+.
+# install.ubuntu.sh — Full workspace installation for Ubuntu 22.04+
 #
-# Strategy for package sources:
-#   apt:   system-level packages, build tools, desktop integration (gnome, fonts, rofi)
-#   brew:  CLI tools that need up-to-date versions (neovim, lazygit, oh-my-posh, node, fzf)
-#   conda: Python environments and ML packages (NOT used for system tools)
-#   curl:  Kitty, Rust, Oh My Zsh (official install methods)
-#
-# Usage:
-#   bash install.ubuntu.sh
-#   # or one-liner:
-#   bash <(curl -fsSL https://raw.githubusercontent.com/Madjakul/dotfiles/main/install.ubuntu.sh)
+# Sources: apt (system), brew (CLI tools), conda (Python), curl (official installers)
 
 set -euo pipefail
 
-# ====== Helper Functions ======
 step_msg()    { printf "\033[36;1m→ %s...\033[0m\n" "$1"; }
 success_msg() { printf "\033[32;1m✓ %s\033[0m\n" "$1"; }
 warn_msg()    { printf "\033[33;1m⚠ %s\033[0m\n" "$1"; }
-error_msg()   { printf "\033[31;1m✗ %s\033[0m\n" "$1"; }
 
-# ====== Banner ======
 printf "\n"
 printf "\033[36;1m██████╗  ██████╗ ████████╗███████╗██╗██╗     ███████╗███████╗\n"
 printf "\033[36;1m██╔══██╗██╔═══██╗╚══██╔══╝██╔════╝██║██║     ██╔════╝██╔════╝\n"
@@ -29,39 +16,26 @@ printf "\033[36;1m██║  ██║██║   ██║   ██║   ██
 printf "\033[36;1m██║  ██║██║   ██║   ██║   ██╔══╝  ██║██║     ██╔══╝  ╚════██║\n"
 printf "\033[36;1m██████╔╝╚██████╔╝   ██║   ██║     ██║███████╗███████╗███████║\n"
 printf "\033[36;1m╚═════╝  ╚═════╝    ╚═╝   ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝\n"
-printf "\033[0m\n"
-printf "\033[35;1mUbuntu Workspace Installer\033[0m\n\n"
+printf "\033[0m\n\033[35;1mUbuntu Workspace Installer\033[0m\n\n"
 
 
 # ══════════════════════════════════════════════════════════════
-# APT: System packages, build tools, desktop integration
+# APT
 # ══════════════════════════════════════════════════════════════
 step_msg "Updating system packages"
 sudo apt update && sudo apt upgrade -y
 
 step_msg "Installing apt packages"
 sudo apt install -y \
-    build-essential \
-    gcc make cmake \
-    curl wget git \
-    unzip zip \
-    zsh \
-    stow \
-    btop \
-    ripgrep \
-    fd-find \
-    font-manager \
-    gnome-tweaks \
-    gnome-shell-extensions \
-    rofi \
-    sshfs \
-    luarocks \
-    libreadline-dev \
-    libfuse2
+    build-essential gcc make cmake \
+    curl wget git unzip zip \
+    zsh stow btop ripgrep fd-find \
+    font-manager gnome-tweaks gnome-shell-extensions \
+    rofi sshfs luarocks libreadline-dev libfuse2
 
 
 # ══════════════════════════════════════════════════════════════
-# HOMEBREW: CLI tools that need the latest versions
+# HOMEBREW
 # ══════════════════════════════════════════════════════════════
 if ! command -v brew &>/dev/null; then
     step_msg "Installing Homebrew"
@@ -75,16 +49,24 @@ fi
 
 step_msg "Installing Homebrew packages"
 brew install \
-    neovim \
-    node \
-    fzf \
-    jesseduffield/lazygit/lazygit \
-    jandedobbeleer/oh-my-posh/oh-my-posh \
-    tmux
+    neovim node fzf tmux \
+    jesseduffield/lazygit/lazygit
+
+# oh-my-posh via official install (brew cask can have sha256 issues)
+step_msg "Installing Oh My Posh"
+if ! command -v oh-my-posh &>/dev/null; then
+    curl -s https://ohmyposh.dev/install.sh | bash -s
+else
+    success_msg "Oh My Posh already installed"
+fi
+
+# tree-sitter CLI (required by nvim-treesitter to build parsers)
+step_msg "Installing tree-sitter CLI"
+npm install -g tree-sitter-cli
 
 
 # ══════════════════════════════════════════════════════════════
-# CONDA: Python environment manager (installed via official installer)
+# CONDA
 # ══════════════════════════════════════════════════════════════
 if ! command -v conda &>/dev/null; then
     step_msg "Installing Miniconda"
@@ -92,18 +74,28 @@ if ! command -v conda &>/dev/null; then
     bash /tmp/miniconda.sh -b -p "$HOME/miniconda3"
     rm /tmp/miniconda.sh
     "$HOME/miniconda3/bin/conda" init zsh
-    "$HOME/miniconda3/bin/conda" config --set auto_activate_base false
+    "$HOME/miniconda3/bin/conda" config --set auto_activate_base true
     success_msg "Miniconda installed"
 else
     success_msg "Conda already installed"
 fi
 
+# Install gpustat in base env (avoids needing brew python + pip)
+step_msg "Installing gpustat and CLI tools in conda base"
+CONDA_BIN="${HOME}/miniconda3/bin/conda"
+if [[ -f "$CONDA_BIN" ]]; then
+    "$CONDA_BIN" run -n base pip install --quiet gpustat
+fi
+
+# Configure conda to auto-install common packages in every new env
+step_msg "Configuring conda create_default_packages"
+"${CONDA_BIN:-conda}" config --add create_default_packages gpustat 2>/dev/null || true
+"${CONDA_BIN:-conda}" config --add create_default_packages ipython 2>/dev/null || true
+
 
 # ══════════════════════════════════════════════════════════════
-# CURL-INSTALLED: Tools with their own official installers
+# CURL-INSTALLED
 # ══════════════════════════════════════════════════════════════
-
-# --- Rust ---
 if ! command -v cargo &>/dev/null; then
     step_msg "Installing Rust"
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -112,13 +104,10 @@ else
     success_msg "Rust already installed"
 fi
 
-# --- Kitty Terminal ---
 if ! command -v kitty &>/dev/null; then
     step_msg "Installing Kitty Terminal"
     curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
-    # Symlink kitty to PATH
     ln -sf "$HOME/.local/kitty.app/bin/kitty" "$HOME/.local/kitty.app/bin/kitten" "$HOME/.local/bin/"
-    # Desktop integration
     mkdir -p "$HOME/.local/share/applications"
     cp "$HOME/.local/kitty.app/share/applications/kitty.desktop" "$HOME/.local/share/applications/"
     cp "$HOME/.local/kitty.app/share/applications/kitty-open.desktop" "$HOME/.local/share/applications/"
@@ -132,11 +121,9 @@ else
     success_msg "Kitty already installed"
 fi
 
-# Set Kitty as default terminal
 step_msg "Setting Kitty as default terminal"
 gsettings set org.gnome.desktop.default-applications.terminal exec "kitty" 2>/dev/null || true
 
-# --- Oh My Zsh ---
 if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
     step_msg "Installing Oh My Zsh"
     RUNZSH=no sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -144,7 +131,6 @@ else
     success_msg "Oh My Zsh already installed"
 fi
 
-# --- Zoxide ---
 if ! command -v zoxide &>/dev/null; then
     step_msg "Installing Zoxide"
     curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
@@ -154,26 +140,25 @@ fi
 
 
 # ══════════════════════════════════════════════════════════════
-# FONTS: RobotoMono Nerd Font with proper italic support
+# FONTS
 # ══════════════════════════════════════════════════════════════
 FONT_DIR="$HOME/.local/share/fonts"
 mkdir -p "$FONT_DIR"
 
 if ! fc-list 2>/dev/null | grep -qi "RobotoMono.*Nerd"; then
     step_msg "Installing RobotoMono Nerd Font"
-    FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/RobotoMono.zip"
-    wget -q "$FONT_URL" -O /tmp/RobotoMono.zip
+    wget -q "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/RobotoMono.zip" -O /tmp/RobotoMono.zip
     unzip -o /tmp/RobotoMono.zip -d "$FONT_DIR"
     rm /tmp/RobotoMono.zip
     fc-cache -fv
-    success_msg "RobotoMono Nerd Font installed (includes Italic variants)"
+    success_msg "RobotoMono Nerd Font installed"
 else
     success_msg "RobotoMono Nerd Font already installed"
 fi
 
 
 # ══════════════════════════════════════════════════════════════
-# TMUX PLUGINS
+# TMUX: Plugins + auto-install
 # ══════════════════════════════════════════════════════════════
 if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
     step_msg "Installing Tmux Plugin Manager"
@@ -189,9 +174,13 @@ else
     success_msg "Tmuxifier already installed"
 fi
 
+# Auto-install tmux plugins (gruvbox theme, vim-tmux-navigator, etc.)
+step_msg "Installing tmux plugins via TPM"
+"$HOME/.tmux/plugins/tpm/bin/install_plugins" 2>/dev/null || warn_msg "TPM install failed (run Ctrl-a I in tmux later)"
+
 
 # ══════════════════════════════════════════════════════════════
-# ZSH CONFIGURATION
+# ZSH + SHELL
 # ══════════════════════════════════════════════════════════════
 step_msg "Setting ZSH as default shell"
 if [[ "$(basename "$SHELL")" != "zsh" ]]; then
@@ -200,14 +189,13 @@ if [[ "$(basename "$SHELL")" != "zsh" ]]; then
     sudo chsh -s "$ZSH_PATH" "$USER"
 fi
 
-# Ensure private_aliases file exists
 mkdir -p "$HOME/.local/bin"
 touch "$HOME/.local/bin/private_aliases"
 chmod u+x "$HOME/.local/bin/private_aliases"
 
 
 # ══════════════════════════════════════════════════════════════
-# DOTFILES: Clone and stow
+# DOTFILES: Clone, stow, and set up tmuxifier layouts
 # ══════════════════════════════════════════════════════════════
 if [[ ! -d "$HOME/dotfiles" ]]; then
     step_msg "Cloning dotfiles"
@@ -224,6 +212,23 @@ for dir in kitty ohmyposh nvim tmux rofi zsh; do
     fi
 done
 
+# Copy tmuxifier layouts
+step_msg "Installing tmuxifier layouts"
+mkdir -p "$HOME/.tmuxifier/layouts"
+cp -f "$HOME/dotfiles/tmuxifier-layouts/"*.sh "$HOME/.tmuxifier/layouts/" 2>/dev/null || true
+
+
+# ══════════════════════════════════════════════════════════════
+# NEOVIM: Headless first-run to install plugins + parsers
+# ══════════════════════════════════════════════════════════════
+step_msg "Installing Neovim plugins (headless)"
+nvim --headless "+Lazy! sync" +qa 2>/dev/null || true
+
+step_msg "Installing treesitter parsers (headless)"
+nvim --headless \
+    "+TSInstall python lua bash c cpp cuda rust json yaml toml ini xml markdown markdown_inline bibtex rst latex dockerfile cmake make ssh_config git_config git_rebase gitattributes gitcommit gitignore vim vimdoc tmux comment" \
+    "+sleep 15" +qa 2>/dev/null || true
+
 
 # ══════════════════════════════════════════════════════════════
 # DONE
@@ -233,8 +238,7 @@ success_msg "Installation complete!"
 echo
 echo "Next steps:"
 echo "  1. Log out and back in (or run: exec zsh)"
-echo "  2. Open Neovim — plugins and Mason tools will auto-install"
-echo "  3. In tmux, press Ctrl-a then I to install tmux plugins"
-echo "  4. Set ANTHROPIC_API_KEY in ~/.local/bin/private_aliases for Claude in Avante"
-echo "  5. Run: bash ~/dotfiles/scripts/dry-run.sh to verify everything"
+echo "  2. Open Neovim to verify plugins loaded"
+echo "  3. Set ANTHROPIC_API_KEY in ~/.local/bin/private_aliases"
+echo "  4. Run: bash ~/dotfiles/scripts/dry-run.sh"
 echo

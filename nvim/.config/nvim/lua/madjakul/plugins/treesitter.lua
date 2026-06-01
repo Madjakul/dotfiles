@@ -1,90 +1,51 @@
 -- lua/madjakul/plugins/treesitter.lua
--- nvim-treesitter 1.0 API: require("nvim-treesitter.configs") was REMOVED.
--- Use require("nvim-treesitter").setup() instead.
--- autotag is now a standalone plugin with its own setup.
+-- nvim-treesitter 1.0: setup() does NOT install parsers.
+-- Parsers are pre-installed by the install script (headless TSInstall).
+-- auto_install = true handles new filetypes opened after first setup.
+-- Requires: tree-sitter-cli (npm install -g tree-sitter-cli)
 
 return {
-	"nvim-treesitter/nvim-treesitter",
-	event = { "BufReadPre", "BufNewFile" },
-	build = ":TSUpdate",
-	dependencies = {
-		-- nvim-ts-autotag now requires its own setup call (not via treesitter)
-		{
-			"windwp/nvim-ts-autotag",
-			config = function()
-				require("nvim-ts-autotag").setup({
-					opts = {
-						enable_close = true,
-						enable_rename = true,
-						enable_close_on_slash = false,
-					},
-				})
-			end,
-		},
-	},
-	config = function()
-		-- NEW API: require("nvim-treesitter"), NOT the old "nvim-treesitter.configs"
-		require("nvim-treesitter").setup({
-			ensure_installed = {
-				-- Core languages
-				"python",
-				"lua",
-				"bash",
-				"c",
-				"cpp",
-				"cuda",
-				"rust",
+    "nvim-treesitter/nvim-treesitter",
+    lazy = false,
+    build = ":TSUpdate",
+    dependencies = {
+        {
+            "windwp/nvim-ts-autotag",
+            config = function()
+                require("nvim-ts-autotag").setup({
+                    opts = {
+                        enable_close = true,
+                        enable_rename = true,
+                        enable_close_on_slash = false,
+                    },
+                })
+            end,
+        },
+    },
+    config = function()
+        -- auto_install: builds parser on first open of an unknown filetype
+        require("nvim-treesitter").setup({
+            auto_install = true,
+        })
 
-				-- Config / data formats
-				"json",
-				"yaml",
-				"toml",
-				"ini",
-				"xml",
+        -- Enable treesitter highlighting for every buffer with a parser
+        local function enable_ts(buf)
+            local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
+            if ok and stats and stats.size > 512 * 1024 then return end
+            if pcall(vim.treesitter.start, buf) then
+                vim.bo[buf].syntax = ""
+            end
+        end
 
-				-- Markup
-				"markdown",
-				"markdown_inline",
-				"bibtex",
-				"rst",
-				"latex",
+        vim.api.nvim_create_autocmd("FileType", {
+            group = vim.api.nvim_create_augroup("TreesitterEnable", { clear = true }),
+            callback = function(args) enable_ts(args.buf) end,
+        })
 
-				-- DevOps
-				"dockerfile",
-				"cmake",
-				"make",
-				"ssh_config",
-
-				-- Git
-				"git_config",
-				"git_rebase",
-				"gitattributes",
-				"gitcommit",
-				"gitignore",
-
-				-- Editor / meta
-				"vim",
-				"vimdoc",
-				"tmux",
-				"regex",
-				"comment",
-			},
-
-			auto_install = true,
-
-			highlight = {
-				enable = true,
-				-- Disable for large files (prevents freeze on accidental checkpoint opens)
-				disable = function(_, buf)
-					local max_filesize = 512 * 1024 -- 512 KB
-					local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
-					if ok and stats and stats.size > max_filesize then
-						return true
-					end
-				end,
-			},
-
-			indent = { enable = true },
-		})
-	end,
+        for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+            if vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].filetype ~= "" then
+                enable_ts(buf)
+            end
+        end
+    end,
 }

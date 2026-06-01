@@ -62,6 +62,7 @@ return {
         })
 
         vim.diagnostic.config({
+            -- Sign column icons (the "flags" on the left)
             signs = {
                 text = {
                     [vim.diagnostic.severity.ERROR] = " ",
@@ -69,14 +70,27 @@ return {
                     [vim.diagnostic.severity.HINT] = " ",
                     [vim.diagnostic.severity.INFO] = " ",
                 },
+                -- Color the line number for diagnostic lines too
+                numhl = {
+                    [vim.diagnostic.severity.ERROR] = "DiagnosticSignError",
+                    [vim.diagnostic.severity.WARN] = "DiagnosticSignWarn",
+                    [vim.diagnostic.severity.HINT] = "DiagnosticSignHint",
+                    [vim.diagnostic.severity.INFO] = "DiagnosticSignInfo",
+                },
             },
+            -- Colored inline diagnostic text (respects gruvbox-material palette)
             virtual_text = {
                 spacing = 4,
                 prefix = "■",
             },
             float = {
                 source = true,
+                border = "rounded",
             },
+            -- Most severe diagnostic shows first in sign column
+            severity_sort = true,
+            -- Underline diagnostic ranges
+            underline = true,
         })
     end,
 }
