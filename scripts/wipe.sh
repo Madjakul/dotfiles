@@ -82,14 +82,22 @@ if confirm "Wipe Zinit plugins?"; then
     echo "  ✓ Zinit cleared"
 fi
 
-# ====== 7. Oh My Zsh ======
+# ====== 7. tree-sitter CLI ======
+if confirm "Wipe tree-sitter CLI (npm + cargo)?"; then
+    echo "--- Wiping tree-sitter ---"
+    npm uninstall -g tree-sitter-cli 2>/dev/null || true
+    cargo uninstall tree-sitter-cli 2>/dev/null || true
+    echo "  ✓ tree-sitter cleared"
+fi
+
+# ====== 8. Oh My Zsh ======
 if confirm "Wipe Oh My Zsh?"; then
     echo "--- Wiping Oh My Zsh ---"
     rm -rf ~/.oh-my-zsh
     echo "  ✓ Oh My Zsh cleared"
 fi
 
-# ====== 8. Stow symlinks ======
+# ====== 9. Stow symlinks ======
 if confirm "Remove stow symlinks from ~/.config?"; then
     echo "--- Removing stow symlinks ---"
     DOTFILES_DIR="${HOME}/dotfiles"
@@ -104,7 +112,7 @@ if confirm "Remove stow symlinks from ~/.config?"; then
     fi
 fi
 
-# ====== 9. Rust ======
+# ====== 10. Rust ======
 if confirm "Wipe Rust (rustup + cargo)?"; then
     echo "--- Wiping Rust ---"
     rustup self uninstall -y 2>/dev/null || true

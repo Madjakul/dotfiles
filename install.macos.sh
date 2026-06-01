@@ -84,7 +84,16 @@ fi
 
 # tree-sitter CLI (required by nvim-treesitter to build parsers)
 step_msg "Installing tree-sitter CLI"
-npm install -g tree-sitter-cli
+if ! command -v tree-sitter &>/dev/null; then
+    if cargo install tree-sitter-cli 2>/dev/null; then
+        success_msg "tree-sitter-cli installed via cargo"
+    else
+        warn_msg "Cargo build failed, trying npm"
+        npm install -g tree-sitter-cli
+    fi
+else
+    success_msg "tree-sitter CLI already installed"
+fi
 
 # Kitty via brew cask on macOS (better integration than curl)
 step_msg "Installing Kitty"

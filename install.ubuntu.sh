@@ -61,8 +61,19 @@ else
 fi
 
 # tree-sitter CLI (required by nvim-treesitter to build parsers)
+# Cargo builds from source (works on any GLIBC); npm binary needs GLIBC 2.39+
 step_msg "Installing tree-sitter CLI"
-npm install -g tree-sitter-cli
+if ! command -v tree-sitter &>/dev/null; then
+    sudo apt install -y libclang-dev 2>/dev/null || true
+    if cargo install tree-sitter-cli 2>/dev/null; then
+        success_msg "tree-sitter-cli installed via cargo"
+    else
+        warn_msg "Cargo build failed, trying npm"
+        npm install -g tree-sitter-cli
+    fi
+else
+    success_msg "tree-sitter CLI already installed"
+fi
 
 
 # ══════════════════════════════════════════════════════════════
