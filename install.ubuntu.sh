@@ -60,20 +60,6 @@ else
     success_msg "Oh My Posh already installed"
 fi
 
-# tree-sitter CLI (required by nvim-treesitter to build parsers)
-# Cargo builds from source (works on any GLIBC); npm binary needs GLIBC 2.39+
-step_msg "Installing tree-sitter CLI"
-if ! command -v tree-sitter &>/dev/null; then
-    sudo apt install -y libclang-dev 2>/dev/null || true
-    if cargo install tree-sitter-cli 2>/dev/null; then
-        success_msg "tree-sitter-cli installed via cargo"
-    else
-        warn_msg "Cargo build failed, trying npm"
-        npm install -g tree-sitter-cli
-    fi
-else
-    success_msg "tree-sitter CLI already installed"
-fi
 
 
 # ══════════════════════════════════════════════════════════════
@@ -113,6 +99,22 @@ if ! command -v cargo &>/dev/null; then
     . "$HOME/.cargo/env"
 else
     success_msg "Rust already installed"
+fi
+
+# tree-sitter CLI (must come AFTER Rust so cargo is available)
+# Cargo builds from source (works on any GLIBC); npm needs GLIBC 2.39+
+step_msg "Installing tree-sitter CLI"
+if ! command -v tree-sitter &>/dev/null; then
+    . "$HOME/.cargo/env" 2>/dev/null || true
+    sudo apt install -y libclang-dev 2>/dev/null || true
+    if cargo install tree-sitter-cli; then
+        success_msg "tree-sitter-cli installed via cargo"
+    else
+        warn_msg "Cargo build failed, trying npm"
+        npm install -g tree-sitter-cli
+    fi
+else
+    success_msg "tree-sitter CLI already installed"
 fi
 
 if ! command -v kitty &>/dev/null; then
