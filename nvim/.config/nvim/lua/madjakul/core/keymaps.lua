@@ -26,4 +26,18 @@ keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer
 -- ====== AI (Copilot + Avante) ======
 keymap.set("n", "<leader>cpd", ":Copilot disable<CR>", { silent = true, noremap = true, desc = "Disable Copilot" })
 keymap.set("n", "<leader>cpe", ":Copilot enable<CR>", { silent = true, noremap = true, desc = "Enable Copilot" })
--- Avante chat: <leader>aa to toggle, <leader>ae to edit selection (set in avante.lua)
+
+-- ====== Stay in visual mode after indenting ======
+keymap.set("v", "<", "<gv", { desc = "Indent left and re-select" })
+keymap.set("v", ">", ">gv", { desc = "Indent right and re-select" })
+
+-- ====== Highlight on yank ======
+vim.api.nvim_create_autocmd("TextYankPost", {
+	group = vim.api.nvim_create_augroup("highlight_yank", { clear = true }),
+	callback = function()
+		vim.highlight.on_yank({ higroup = "IncSearch", timeout = 200 })
+	end,
+})
+
+-- ====== Paste over selection without losing clipboard ======
+keymap.set("x", "p", [["_dP]], { desc = "Paste without overwriting register" })

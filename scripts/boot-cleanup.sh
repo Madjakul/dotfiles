@@ -11,15 +11,20 @@ echo "=== Running kernel: $CURRENT ==="
 echo
 
 # 1. Purge old kernel packages (everything except the running kernel)
+#    Only target version-specific packages (contain patterns like 5.15.0-173 or 6.8.0-124)
+#    to automatically preserve metapackages (linux-image-generic, linux-headers-generic-hwe-*, etc.)
 echo "--- Purging old kernel packages ---"
 OLD_PKGS=$(
     dpkg --list 'linux-image-*' 'linux-headers-*' 'linux-modules-*' 'linux-modules-extra-*' |
         awk '/^ii/ {print $2}' |
-        grep -v "$CURRENT" |
-        grep -v "linux-image-generic" || true
+        grep -E '[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-' |
+        grep -v "$CURRENT" || true
 )
 
 if [ -n "$OLD_PKGS" ]; then
+    echo "Packages to purge:"
+    echo "$OLD_PKGS"
+    echo
     apt-get purge -y $OLD_PKGS
 else
     echo "No old kernel packages found."
