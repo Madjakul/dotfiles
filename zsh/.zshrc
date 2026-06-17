@@ -88,7 +88,7 @@ if [[ -n "$__conda_setup" ]]; then
         # Fallback: source conda.sh directly
         for conda_path in "$HOME/miniconda3" "$HOME/anaconda3"; do
             if [[ -f "$conda_path/etc/profile.d/conda.sh" ]]; then
-                . "$conda_path/etc/profile.d/conda.sh"
+# . "$conda_path/etc/profile.d/conda.sh"  # commented out by conda initialize
                 break
             fi
         done
@@ -193,3 +193,19 @@ export PIP_CACHE_DIR="${PIP_CACHE_DIR:-$HOME/.cache/pip}"
 # ====== Boot Cleanup (Ubuntu) ======
 # Run before apt upgrades when /boot fills up
 alias boot-cleanup="sudo bash $HOME/dotfiles/scripts/boot-cleanup.sh"
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/madjakul/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/madjakul/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/home/madjakul/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/madjakul/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
