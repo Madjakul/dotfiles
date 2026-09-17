@@ -57,6 +57,10 @@ else
 fi
 
 step_msg "Installing Homebrew packages"
+brew tap jesseduffield/lazygit 2>/dev/null || true
+brew trust jesseduffield/lazygit 2>/dev/null || true
+brew tap jandedobbeleer/oh-my-posh 2>/dev/null || true
+brew trust jandedobbeleer/oh-my-posh 2>/dev/null || true
 brew install \
     git \
     curl \
@@ -73,7 +77,7 @@ brew install \
     luarocks \
     jesseduffield/lazygit/lazygit
 
-# oh-my-posh via official install
+# oh-my-posh via brew on macOS (curl as fallback)
 step_msg "Installing Oh My Posh"
 if ! command -v oh-my-posh &>/dev/null; then
     brew install jandedobbeleer/oh-my-posh/oh-my-posh 2>/dev/null || \

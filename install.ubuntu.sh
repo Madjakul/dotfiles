@@ -48,6 +48,8 @@ else
 fi
 
 step_msg "Installing Homebrew packages"
+brew tap jesseduffield/lazygit 2>/dev/null || true
+brew trust jesseduffield/lazygit 2>/dev/null || true
 brew install \
     neovim node fzf tmux \
     jesseduffield/lazygit/lazygit
