@@ -209,3 +209,12 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
+# ====== PATH Sanity ======
+# Nested shells (tmux panes, editor terminals) re-run this file and re-prepend
+# brew and ~/.local/bin above an already-active conda env, so pip/python3 stop
+# pointing into the env. Keep the active env first and dedupe PATH.
+if [[ -n "$CONDA_PREFIX" ]]; then
+    path=("$CONDA_PREFIX/bin" ${(@)path:#$CONDA_PREFIX/bin})
+fi
+typeset -U path
+
