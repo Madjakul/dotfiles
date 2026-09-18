@@ -160,16 +160,13 @@ fi
 FONT_DIR="$HOME/.local/share/fonts"
 mkdir -p "$FONT_DIR"
 
-if ! fc-list 2>/dev/null | grep -qi "RobotoMono.*Nerd"; then
-    step_msg "Installing RobotoMono Nerd Font"
-    wget -q "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/RobotoMono.zip" -O /tmp/RobotoMono.zip
-    unzip -o /tmp/RobotoMono.zip -d "$FONT_DIR"
-    rm /tmp/RobotoMono.zip
-    fc-cache -fv
-    success_msg "RobotoMono Nerd Font installed"
-else
-    success_msg "RobotoMono Nerd Font already installed"
-fi
+# Always pull the latest release (older ones miss newer glyphs, e.g. the yaml icon)
+step_msg "Installing RobotoMono Nerd Font (latest)"
+wget -q "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/RobotoMono.zip" -O /tmp/RobotoMono.zip
+unzip -o /tmp/RobotoMono.zip -d "$FONT_DIR"
+rm /tmp/RobotoMono.zip
+fc-cache -f
+success_msg "RobotoMono Nerd Font installed"
 
 
 # ══════════════════════════════════════════════════════════════
@@ -188,10 +185,6 @@ if [[ ! -d "$HOME/.tmuxifier" ]]; then
 else
     success_msg "Tmuxifier already installed"
 fi
-
-# Auto-install tmux plugins (gruvbox theme, vim-tmux-navigator, etc.)
-step_msg "Installing tmux plugins via TPM"
-"$HOME/.tmux/plugins/tpm/bin/install_plugins" 2>/dev/null || warn_msg "TPM install failed (run Ctrl-a I in tmux later)"
 
 
 # ══════════════════════════════════════════════════════════════
@@ -221,7 +214,7 @@ fi
 
 step_msg "Stowing dotfiles"
 cd "$HOME/dotfiles"
-for dir in kitty ohmyposh nvim tmux rofi zsh; do
+for dir in kitty ohmyposh nvim ruff tmux rofi zsh; do
     if [[ -d "$dir" ]]; then
         stow --restow "$dir" 2>/dev/null || warn_msg "Could not stow $dir (check for conflicts)"
     fi
@@ -231,6 +224,10 @@ done
 step_msg "Installing tmuxifier layouts"
 mkdir -p "$HOME/.tmuxifier/layouts"
 cp -f "$HOME/dotfiles/tmuxifier-layouts/"*.sh "$HOME/.tmuxifier/layouts/" 2>/dev/null || true
+
+# Install tmux plugins (needs ~/.tmux.conf, so must run after stow)
+step_msg "Installing tmux plugins via TPM"
+"$HOME/.tmux/plugins/tpm/bin/install_plugins" || warn_msg "TPM install failed (run Ctrl-a I in tmux later)"
 
 
 # ══════════════════════════════════════════════════════════════

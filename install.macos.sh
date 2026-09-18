@@ -105,7 +105,7 @@ brew install --cask kitty 2>/dev/null || success_msg "Kitty already installed"
 
 # Font via brew cask
 step_msg "Installing RobotoMono Nerd Font"
-brew install --cask font-roboto-mono-nerd-font 2>/dev/null || success_msg "Font already installed"
+brew install --cask font-roboto-mono-nerd-font 2>/dev/null || brew upgrade --cask font-roboto-mono-nerd-font 2>/dev/null || success_msg "Font already up to date"
 
 
 # ══════════════════════════════════════════════════════════════
@@ -186,10 +186,6 @@ else
     success_msg "Tmuxifier already installed"
 fi
 
-# Auto-install tmux plugins
-step_msg "Installing tmux plugins via TPM"
-"$HOME/.tmux/plugins/tpm/bin/install_plugins" 2>/dev/null || warn_msg "TPM install failed (run Ctrl-a I in tmux later)"
-
 
 # ══════════════════════════════════════════════════════════════
 # ZSH CONFIGURATION
@@ -212,7 +208,7 @@ fi
 
 step_msg "Stowing dotfiles"
 cd "$HOME/dotfiles"
-for dir in kitty ohmyposh nvim tmux zsh; do
+for dir in kitty ohmyposh nvim ruff tmux zsh; do
     if [[ -d "$dir" ]]; then
         stow --restow "$dir" 2>/dev/null || warn_msg "Could not stow $dir"
     fi
@@ -222,6 +218,10 @@ done
 step_msg "Installing tmuxifier layouts"
 mkdir -p "$HOME/.tmuxifier/layouts"
 cp -f "$HOME/dotfiles/tmuxifier-layouts/"*.sh "$HOME/.tmuxifier/layouts/" 2>/dev/null || true
+
+# Install tmux plugins (needs ~/.tmux.conf, so must run after stow)
+step_msg "Installing tmux plugins via TPM"
+"$HOME/.tmux/plugins/tpm/bin/install_plugins" || warn_msg "TPM install failed (run Ctrl-a I in tmux later)"
 
 
 # ══════════════════════════════════════════════════════════════

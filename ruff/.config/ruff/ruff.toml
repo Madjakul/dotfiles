@@ -1,0 +1,5 @@
+# ruff/.config/ruff/ruff.toml
+# Global Ruff configuration — used by the CLI, conform.nvim, and the Ruff LSP.
+# Project-level pyproject.toml / ruff.toml files take precedence over this.
+
+line-length = 89

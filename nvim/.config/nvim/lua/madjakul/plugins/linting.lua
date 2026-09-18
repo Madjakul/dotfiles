@@ -1,5 +1,5 @@
 -- lua/madjakul/plugins/linting.lua
--- Ruff as Python linter (replaces flake8/pylint, much faster)
+-- Python diagnostics come from the Ruff LSP (see lsp/mason.lua), not nvim-lint
 
 return {
     "mfussenegger/nvim-lint",
@@ -8,7 +8,6 @@ return {
         local lint = require("lint")
 
         lint.linters_by_ft = {
-            python = { "ruff" },
             javascript = { "eslint_d" },
             typescript = { "eslint_d" },
             javascriptreact = { "eslint_d" },

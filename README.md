@@ -35,7 +35,7 @@ Install prerequisites: [git](https://git-scm.com/), [brew](https://brew.sh/), [s
 Remove any existing symlinks, then stow each module:
 
 ```sh
-stow kitty ohmyposh nvim tmux rofi zsh
+stow kitty ohmyposh nvim ruff tmux rofi zsh
 ```
 
 ## What's Included

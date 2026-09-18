@@ -41,19 +41,14 @@ return {
             },
 
             format_on_save = {
-                lsp_fallback = true,
+                lsp_format = "fallback",
                 async = false,
                 timeout_ms = 3000,
             },
 
-            -- Ruff format config: respect your line-length preference
+            -- Ruff reads line-length from ~/.config/ruff/ruff.toml (or the
+            -- project's pyproject.toml), so no extra args are needed here.
             formatters = {
-                ruff_format = {
-                    prepend_args = { "--line-length", "89" },
-                },
-                ruff_organize_imports = {
-                    prepend_args = { "--line-length", "89" },
-                },
                 shfmt = {
                     prepend_args = { "-i", "4", "-ci" },
                 },
@@ -62,7 +57,7 @@ return {
 
         vim.keymap.set({ "n", "v" }, "<leader>mp", function()
             conform.format({
-                lsp_fallback = true,
+                lsp_format = "fallback",
                 async = false,
                 timeout_ms = 3000,
             })

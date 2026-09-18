@@ -87,15 +87,9 @@ return {
                 },
             })
 
-            -- Ruff LSP: let it handle linting + import sorting,
-            -- but disable its hover in favor of Pyright's
-            vim.lsp.config("ruff", {
-                init_options = {
-                    settings = {
-                        lineLength = 89,
-                    },
-                },
-            })
+            -- Ruff LSP: handles linting + import sorting. Settings such as
+            -- line-length come from ~/.config/ruff/ruff.toml (or the project's
+            -- pyproject.toml), shared with the conform formatters.
 
             -- Disable Ruff hover so Pyright's hover takes priority
             vim.api.nvim_create_autocmd("LspAttach", {
