@@ -14,7 +14,7 @@ return {
         providers = {
             claude = {
                 endpoint = "https://api.anthropic.com",
-                model = "claude-sonnet-4-20250514",
+                model = "claude-sonnet-5-5",
                 timeout = 30000,
                 extra_request_body = {
                     temperature = 0,
@@ -54,6 +54,7 @@ return {
         "hrsh7th/nvim-cmp",
         "nvim-tree/nvim-web-devicons",
         "zbirenbaum/copilot.lua",         -- still needed for copilot fallback provider
+        { "ColinKennedy/mega.cmdparse", dependencies = { "ColinKennedy/mega.logging" } },
         {
             "HakonHarnes/img-clip.nvim",
             event = "VeryLazy",
