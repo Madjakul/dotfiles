@@ -11,6 +11,18 @@ return {
         vim.g.loaded_netrw = 1
         vim.g.loaded_netrwPlugin = 1
 
+        -- Mount points of SSHFS/FUSE filesystems (Linux: "type fuse.sshfs",
+        -- macOS: "(macfuse, ..."), resolved once at startup.
+        local sshfs_mounts = {}
+        for _, line in ipairs(vim.fn.systemlist("mount")) do
+            if line:find("sshfs") or line:find("fuse") then
+                local mount = line:match(" on (/.-) type ") or line:match(" on (/.-) %(")
+                if mount then
+                    table.insert(sshfs_mounts, mount)
+                end
+            end
+        end
+
         nvimtree.setup({
             view = {
                 width = 35,
@@ -48,9 +60,25 @@ return {
                 ignore = false,
                 timeout = 2000, -- generous timeout for SSHFS latency
             },
-            -- Reduce filesystem watches on SSHFS
+            -- Live refresh on local disks; skipped on SSHFS mounts (inotify can't
+            -- see remote changes there) and on dirs that churn during ML runs.
+            -- Use <leader>er to refresh manually inside SSHFS mounts.
             filesystem_watchers = {
-                enable = false, -- disable for SSHFS; manual refresh with <leader>er
+                enable = true,
+                debounce_delay = 100,
+                ignore_dirs = function(path)
+                    for _, mount in ipairs(sshfs_mounts) do
+                        if path == mount or vim.startswith(path, mount .. "/") then
+                            return true
+                        end
+                    end
+                    return path:match("/node_modules$") ~= nil
+                        or path:match("/%.git$") ~= nil
+                        or path:match("/wandb$") ~= nil
+                        or path:match("/checkpoints$") ~= nil
+                        or path:match("/outputs$") ~= nil
+                        or path:match("/logs$") ~= nil
+                end,
             },
             -- Diagnostics in tree (optional, can slow SSHFS)
             diagnostics = {

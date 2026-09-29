@@ -46,6 +46,33 @@ opt.splitbelow = true
 -- ====== Files ======
 opt.swapfile = false
 
+-- Reload buffers changed outside Neovim (e.g. by Claude Code, git, formatters).
+-- autoread only acts when a check runs, so trigger :checktime on focus/buffer
+-- events plus a 1s poll. Polling (not inotify) is what works on SSHFS mounts.
+opt.autoread = true
+
+local function checktime()
+    -- :checktime is invalid in the command-line window and noisy in cmd mode
+    if vim.fn.mode() ~= "c" and vim.fn.getcmdwintype() == "" then
+        vim.cmd("silent! checktime")
+    end
+end
+
+local autoread_group = vim.api.nvim_create_augroup("AutoReload", { clear = true })
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI", "TermLeave" }, {
+    group = autoread_group,
+    callback = checktime,
+})
+vim.api.nvim_create_autocmd("FileChangedShellPost", {
+    group = autoread_group,
+    callback = function(args)
+        vim.notify("Reloaded " .. vim.fn.fnamemodify(args.file, ":~:."), vim.log.levels.INFO)
+    end,
+})
+
+local reload_timer = vim.uv.new_timer()
+reload_timer:start(1000, 1000, vim.schedule_wrap(checktime))
+
 -- ====== Statusline ======
 -- Global statusline so splits collapse cleanly
 opt.laststatus = 3
